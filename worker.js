@@ -4,6 +4,11 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 console.log("env key", process.env.KEY);
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.post('/task/logs', (req, res) => {
   const taskPayload = req.body;
 
