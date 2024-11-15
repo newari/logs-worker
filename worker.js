@@ -1,26 +1,27 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 
 const app = express();
-app.use(bodyParser.json());
-console.log("env key", process.env.KEY);
 
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+// Middleware to parse Pub/Sub messages
+app.use(express.json());
+
+// Endpoint to handle Pub/Sub messages
+app.post('/', (req, res) => {
+  const message = req.body.message;
+
+  if (message) {
+    const data = Buffer.from(message.data, 'base64').toString();
+    console.log(`Received message: ${data}`);
+  } else {
+    console.log('No message received!');
+  }
+
+  // Acknowledge the message
+  res.status(204).send();
 });
 
-app.post('/task/logs', (req, res) => {
-  const taskPayload = req.body;
-
-  console.log('Task received:', taskPayload);
-  console.log("env key", process.env.KEY2);
-  // Perform your task logic here
-
-  res.status(200).send('Task completed!');
-});
-
-// Start server
+// Start the server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Worker running on port ${PORT}`);
+  console.log(`Subscriber service listening on port ${PORT}`);
 });
